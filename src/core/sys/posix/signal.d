@@ -307,6 +307,7 @@ else version( OSX )
     enum SIGUSR1    = 30;
     enum SIGUSR2    = 31;
     enum SIGURG     = 16;
+    enum SIGWINCH   = 28;
 }
 else version( FreeBSD )
 {

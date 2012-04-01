@@ -291,6 +291,10 @@ else version (OSX)
 {
     import core.sys.posix.termios; // termios
     import core.sys.posix.sys.time; // timeval
+    import core.sys.posix.sys.ttycom;
+
+    enum TIOCGSIZE = TIOCGWINSZ;
+    enum TIOCSSIZE = TIOCSWINSZ;
 
     struct winsize
     {
