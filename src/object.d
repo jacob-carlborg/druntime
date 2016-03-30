@@ -10,6 +10,173 @@
 
 module object;
 
+alias Identifier = string;
+
+enum TypeKind
+{
+    // This order needs to match the one in the compiler
+    array,
+    sarray,
+    aarray,
+    pointer,
+    reference,
+    function_,
+    ident,
+    class_,
+    struct_,
+    enum_,
+
+    delegate_,
+    none,
+    void_,
+    int8,
+    uns8,
+    int16,
+    uns16,
+    int32,
+    uns32,
+    int64,
+
+    uns64,
+    float32,
+    float64,
+    float80,
+    imaginary32,
+    imaginary64,
+    imaginary80,
+    complex32,
+    complex64,
+    complex80,
+
+    bool_,
+    char_,
+    wchar_,
+    dchar_,
+    error,
+    instance,
+    typeof_,
+    tuple,
+    slice,
+    return_,
+
+    null_,
+    vector,
+    int128,
+    uns128,
+}
+
+abstract class AstNode {}
+abstract class Expression : AstNode {}
+abstract class Initializer : AstNode {}
+
+class Symbol : AstNode
+{
+    Identifier ident;
+
+    this(Identifier ident = null)
+    {
+        this.ident = ident;
+    }
+
+    static Symbol opCall(Identifier ident = null)
+    {
+        return new Symbol(ident);
+    }
+}
+
+abstract class Declaration : Symbol
+{
+    Type type;
+
+    this(Identifier ident, Type type = null)
+    {
+        super(ident);
+        this.type = type;
+    }
+}
+
+abstract class Type : AstNode
+{
+    TypeKind typeKind;
+
+    this(TypeKind typeKind)
+    {
+        this.typeKind = typeKind;
+    }
+
+    static Type opCall(T)()
+    {
+        static if (is(T == int))
+            return new TypeBasic(TypeKind.int32);
+        else
+            static assert(false);
+    }
+}
+
+abstract class BinExp : Expression
+{
+    Expression left;
+    Expression right;
+
+    this(Expression left, Expression right)
+    {
+        this.left = left;
+        this.right = right;
+    }
+}
+
+final class AddExp : BinExp
+{
+    this(Expression left, Expression right)
+    {
+        super(left, right);
+    }
+
+    static AddExp opCall(Expression left, Expression right)
+    {
+        return new AddExp(left, right);
+    }
+}
+
+final class IntegerExp : Expression
+{
+    int value;
+
+    this(int value)
+    {
+        this.value = value;
+    }
+
+    static IntegerExp opCall(int value)
+    {
+        return new IntegerExp(value);
+    }
+}
+
+final class TypeBasic : Type
+{
+    this(TypeKind typeKind)
+    {
+        super(typeKind);
+    }
+}
+
+class VarDeclaration : Declaration
+{
+    Initializer initializer;
+
+    this(Identifier ident, Type type, Initializer initializer = null)
+    {
+        super(ident, type);
+        this.initializer = initializer;
+    }
+
+    static VarDeclaration opCall(Identifier ident, Type type, Initializer initializer = null)
+    {
+        return new VarDeclaration(ident, type, initializer);
+    }
+}
+
 private
 {
     extern (C) Object _d_newclass(const TypeInfo_Class ci);
