@@ -13,7 +13,6 @@ unittest
     int result;
     auto b = block({ result = value; });
     voidVoidArgs(&b);
-
     assert(result == value);
 }
 
@@ -24,7 +23,6 @@ unittest
 
     auto b = block({ return value; });
     auto result = intVoidArgs(&b);
-
     assert(result == value);
 }
 
@@ -38,7 +36,6 @@ unittest
        result = v;
     });
     voidIntArgs(&b, value);
-
     assert(result == value);
 }
 
@@ -51,6 +48,5 @@ unittest
         return v;
     });
     auto result = intIntArgs(&b, value);
-
     assert(result == value);
 }
