@@ -15,6 +15,15 @@ DOCS=\
 	$(DOCDIR)\core_time.html \
 	$(DOCDIR)\core_vararg.html \
 	\
+	$(DOCDIR)\core_ast_ast_node.html \
+	$(DOCDIR)\core_ast_declaration.html \
+	$(DOCDIR)\core_ast_expression.html \
+	$(DOCDIR)\core_ast_initializer.html \
+	$(DOCDIR)\core_ast_package.html \
+	$(DOCDIR)\core_ast_statement.html \
+	$(DOCDIR)\core_ast_symbol.html \
+	$(DOCDIR)\core_ast_type.html \
+	\
 	$(DOCDIR)\core_stdc_complex.html \
 	$(DOCDIR)\core_stdc_ctype.html \
 	$(DOCDIR)\core_stdc_errno.html \

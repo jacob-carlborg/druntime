@@ -15,6 +15,15 @@ COPY=\
 	$(IMPDIR)\core\time.d \
 	$(IMPDIR)\core\vararg.d \
 	\
+	$(IMPDIR)\core\ast\ast_node.d \
+	$(IMPDIR)\core\ast\declaration.d \
+	$(IMPDIR)\core\ast\expression.d \
+	$(IMPDIR)\core\ast\initializer.d \
+	$(IMPDIR)\core\ast\package.d \
+	$(IMPDIR)\core\ast\statement.d \
+	$(IMPDIR)\core\ast\symbol.d \
+	$(IMPDIR)\core\ast\type.d \
+	\
 	$(IMPDIR)\core\internal\abort.d \
 	$(IMPDIR)\core\internal\convert.d \
 	$(IMPDIR)\core\internal\hash.d \

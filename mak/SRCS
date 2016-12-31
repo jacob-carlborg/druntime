@@ -16,6 +16,15 @@ SRCS=\
 	src\core\time.d \
 	src\core\vararg.d \
 	\
+	src\core\ast\ast_node.d \
+	src\core\ast\declaration.d \
+	src\core\ast\expression.d \
+	src\core\ast\initializer.d \
+	src\core\ast\package.d \
+	src\core\ast\statement.d \
+	src\core\ast\symbol.d \
+	src\core\ast\type.d \
+	\
 	src\core\internal\abort.d \
 	src\core\internal\convert.d \
 	src\core\internal\hash.d \
