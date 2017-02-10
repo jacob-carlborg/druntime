@@ -10,6 +10,8 @@ module core.ast.statement;
 
 import core.ast.ast_node;
 import core.ast.expression;
+import core.ast.symbol;
+import core.ast.type;
 
 abstract class Statement : AstNode
 {
@@ -18,6 +20,8 @@ abstract class Statement : AstNode
 
 class ExpressionStatement : Statement
 {
+    private enum nodeType = NodeType.expressionStatement;
+
     Expression expression;
 
     this(Expression expression)
@@ -45,5 +49,40 @@ class CompoundStatement : Statement
     static CompoundStatement opCall(Statement[] statements)
     {
         return new CompoundStatement(statements);
+    }
+}
+
+class ForeachStatement : Statement
+{
+    private enum nodeType = NodeType.foreachStatement;
+
+    NodeType foreachType;
+    Parameter[] parameters;
+    Expression aggr;
+    Statement body_;
+
+    this(NodeType foreachType, Parameter[] parameters, Expression aggr, Statement body_)
+    {
+        this.foreachType = foreachType;
+        this.parameters = parameters;
+        this.aggr = aggr;
+        this.body_ = body_;
+    }
+}
+
+class ImportStatement : Statement
+{
+    private enum nodeType = NodeType.importStatement;
+
+    Symbol[] imports;
+
+    this(Symbol[] imports)
+    {
+        this.imports = imports;
+    }
+
+    static ImportStatement opCall(Symbol[] imports)
+    {
+        return new ImportStatement(imports);
     }
 }

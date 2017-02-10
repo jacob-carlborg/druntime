@@ -41,3 +41,30 @@ class Symbol : AstNode
         return new Symbol(ident);
     }
 }
+
+/**
+ * This class represents a scope symbol in the AST.
+ *
+ * It's the base class of all AST nodes which are a symbols containing a scope.
+ */
+class ScopeSymbol : Symbol
+{
+    private enum nodeType = NodeType.scopeSymbol;
+
+    /**
+     * Creates a new scope symbol with the given identifier.
+     *
+     * Params:
+     *  ident = the identifier of the symbol
+     */
+    this(Identifier ident = null)
+    {
+        super(ident);
+    }
+
+    /// ditto
+    static ScopeSymbol opCall(Identifier ident = null)
+    {
+        return new ScopeSymbol(ident);
+    }
+}

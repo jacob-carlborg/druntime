@@ -10,11 +10,20 @@ module core.ast.expression;
 
 import core.ast.ast_node;
 import core.ast.declaration;
+import core.ast.symbol;
+import core.ast.type;
 
 /// This is the abstract base class for all expression nodes.
 abstract class Expression : AstNode
 {
     private enum nodeType = NodeType.expression;
+
+    Type type;
+
+    this(Type type)
+    {
+        this.type = type;
+    }
 }
 
 /**
@@ -42,8 +51,9 @@ abstract class BinExp : Expression
      *  left = the left hand side expression
      *  right = the right hand side expression
      */
-    this(Expression left, Expression right)
+    this(Type type, Expression left, Expression right)
     {
+        super(type);
         this.left = left;
         this.right = right;
     }
@@ -68,15 +78,33 @@ final class AddExp : BinExp
      *  left = the left hand side expression
      *  right = the right hand side expression
      */
-    this(Expression left, Expression right)
+    this(Type type, Expression left, Expression right)
     {
-        super(left, right);
+        super(type, left, right);
     }
 
     /// ditto
-    static AddExp opCall(Expression left, Expression right)
+    static AddExp opCall(Type type, Expression left, Expression right)
     {
-        return new AddExp(left, right);
+        return new AddExp(type, left, right);
+    }
+}
+
+final class ArrayLiteralExpression : Expression
+{
+    private enum nodeType = NodeType.arrayLiteralExpression;
+
+    Expression[] elements;
+
+    this(Type type, Expression[] elements)
+    {
+        super(type);
+        this.elements = elements;
+    }
+
+    static ArrayLiteralExpression opCall(Type type, Expression[] elements)
+    {
+        return new ArrayLiteralExpression(type, elements);
     }
 }
 
@@ -91,15 +119,15 @@ class AssignExpression : BinExp
      *  left = the left hand side expression
      *  right = the right hand side expression
      */
-    this(Expression left, Expression right)
+    this(Type type, Expression left, Expression right)
     {
-        super(left, right);
+        super(type, left, right);
     }
 
     /// ditto
-    static AssignExpression opCall(Expression left, Expression right)
+    static AssignExpression opCall(Type type, Expression left, Expression right)
     {
-        return new AssignExpression(left, right);
+        return new AssignExpression(type, left, right);
     }
 }
 
@@ -114,15 +142,35 @@ final class BlitExpression : AssignExpression
      *  left = the left hand side expression
      *  right = the right hand side expression
      */
-    this(Expression left, Expression right)
+    this(Type type, Expression left, Expression right)
     {
-        super(left, right);
+        super(type, left, right);
     }
 
     /// ditto
-    static BlitExpression opCall(Expression left, Expression right)
+    static BlitExpression opCall(Type type, Expression left, Expression right)
     {
-        return new BlitExpression(left, right);
+        return new BlitExpression(type, left, right);
+    }
+}
+
+class CallExpression : UnaryExpression
+{
+    private enum nodeType = NodeType.callExpression;
+
+    FunctionDeclaration functionDeclaration;
+    Expression[] arguments;
+
+    this(Type type, Expression expression, FunctionDeclaration functionDeclaration, Expression[] arguments = [])
+    {
+        super(type, expression);
+        this.functionDeclaration = functionDeclaration;
+        this.arguments = arguments;
+    }
+
+    static CallExpression opCall(Type type, Expression expression, FunctionDeclaration functionDeclaration, Expression[] arguments = [])
+    {
+        return new CallExpression(type, expression, functionDeclaration, arguments);
     }
 }
 
@@ -132,14 +180,15 @@ final class DeclarationExpression : Expression
 
     Declaration declaration;
 
-    this(Declaration declaration)
+    this(Type type, Declaration declaration)
     {
+        super(type);
         this.declaration = declaration;
     }
 
-    static DeclarationExpression opCall(Declaration declaration)
+    static DeclarationExpression opCall(Type type, Declaration declaration)
     {
-        return new DeclarationExpression(declaration);
+        return new DeclarationExpression(type, declaration);
     }
 }
 
@@ -164,15 +213,34 @@ final class IntegerExp : Expression
      * Params:
      *  value = the value of the integer expression
      */
-    this(int value)
+    this(Type type, int value)
     {
+        super(type);
         this.value = value;
     }
 
     /// ditto
-    static IntegerExp opCall(int value)
+    static IntegerExp opCall(Type type, int value)
     {
-        return new IntegerExp(value);
+        return new IntegerExp(type, value);
+    }
+}
+
+class UnaryExpression : Expression
+{
+    private enum nodeType = NodeType.unaryExpression;
+
+    Expression expression;
+
+    this(Type type, Expression expression)
+    {
+        super(type);
+        this.expression = expression;
+    }
+
+    static UnaryExpression opCall(Type type, Expression expression)
+    {
+        return new UnaryExpression(type, expression);
     }
 }
 
@@ -182,14 +250,15 @@ class SymbolExpression : Expression
 
     Declaration variable;
 
-    this(Declaration variable)
+    this(Type type, Declaration variable)
     {
+        super(type);
         this.variable = variable;
     }
 
-    static SymbolExpression opCall(Declaration variable)
+    static SymbolExpression opCall(Type type, Declaration variable)
     {
-        return new SymbolExpression(variable);
+        return new SymbolExpression(type, variable);
     }
 }
 
@@ -197,13 +266,54 @@ final class VariableExpression : SymbolExpression
 {
     private enum nodeType = NodeType.variableExpression;
 
-    this(Declaration variable)
+    this(Type type, Declaration variable)
     {
-        super(variable);
+        super(type, variable);
     }
 
-    static VariableExpression opCall(Declaration variable)
+    static VariableExpression opCall(Type type, Declaration variable)
     {
-        return new VariableExpression(variable);
+        return new VariableExpression(type, variable);
+    }
+}
+
+final class StringExpression : Expression
+{
+    private enum nodeType = NodeType.stringExpression;
+
+    string value;
+
+    this(Type type, string value)
+    {
+        super(type);
+        this.value = value;
+    }
+
+    static StringExpression opCall(Type type, string value)
+    {
+        return new StringExpression(type, value);
+    }
+}
+
+final class FunctionExpression : Expression
+{
+    private enum nodeType = NodeType.functionExpression;
+
+    FunctionLiteralDeclaration declaration;
+    NodeType functionType;
+
+    this(Type type, FunctionLiteralDeclaration declaration)
+    {
+        // if (declaration is null)
+        //     throw new Exception("The given FunctionLiteralDeclaration is null");
+
+        super(type);
+        this.declaration = declaration;
+        functionType = declaration.functionType;
+    }
+
+    static FunctionExpression opCall(Type type, FunctionLiteralDeclaration declaration)
+    {
+        return new FunctionExpression(type, declaration);
     }
 }

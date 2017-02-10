@@ -36,6 +36,29 @@ abstract class Declaration : Symbol
     }
 }
 
+class EnumDeclaration : ScopeSymbol
+{
+    private enum nodeType = NodeType.enumDeclaration;
+
+    /// The enum type
+    Type type;
+
+    /// The type of the members
+    Type memberType;
+
+    this(Identifier identifier, Type memberType)
+    {
+        super(identifier);
+        this.memberType = memberType;
+        // type = new EnumType(this);
+    }
+
+    static EnumDeclaration opCall(Identifier identifier, Type memberType)
+    {
+        return new EnumDeclaration(identifier, memberType);
+    }
+}
+
 /**
  * This class represents a variable declaration, with or without initializer.
  *
@@ -77,6 +100,7 @@ class FunctionDeclaration : Declaration
     private enum nodeType = NodeType.functionDeclaration;
 
     Statement body_;
+    ForeachStatement foreachStatement;
 
     this(Identifier ident, Type type, Statement body_ = null)
     {
@@ -87,5 +111,35 @@ class FunctionDeclaration : Declaration
     static FunctionDeclaration opCall(Identifier ident, Type type, Statement body_ = null)
     {
         return new FunctionDeclaration(ident, type, body_);
+    }
+}
+
+final class FunctionLiteralDeclaration : FunctionDeclaration
+{
+    private enum nodeType = NodeType.functionLiteralDeclaration;
+
+    NodeType functionType;
+
+    this(Type type, NodeType functionType, ForeachStatement foreachStatement, Identifier identifier = "")
+    {
+        super(identifier, type);
+        this.functionType = functionType;
+        this.foreachStatement = foreachStatement;
+    }
+
+    this(Type type, NodeType functionType, Statement body_, Identifier identifier = "")
+    {
+        super(identifier, type, body_);
+        this.functionType = functionType;
+    }
+
+    static FunctionLiteralDeclaration opCall(Type type, NodeType functionType, ForeachStatement foreachStatement, Identifier identifier = "")
+    {
+        return new FunctionLiteralDeclaration(type, functionType, foreachStatement, identifier);
+    }
+
+    static FunctionLiteralDeclaration opCall(Type type, NodeType functionType, Statement body_, Identifier identifier = "")
+    {
+        return new FunctionLiteralDeclaration(type, functionType, body_, identifier);
     }
 }

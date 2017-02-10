@@ -23,6 +23,7 @@ DOCS=\
 	$(DOCDIR)\core_ast_statement.html \
 	$(DOCDIR)\core_ast_symbol.html \
 	$(DOCDIR)\core_ast_type.html \
+  $(DOCDIR)\core_ast_util.html \
 	\
 	$(DOCDIR)\core_stdc_complex.html \
 	$(DOCDIR)\core_stdc_ctype.html \

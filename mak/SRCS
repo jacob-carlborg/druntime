@@ -24,6 +24,7 @@ SRCS=\
 	src\core\ast\statement.d \
 	src\core\ast\symbol.d \
 	src\core\ast\type.d \
+  src\core\ast\util.d \
 	\
 	src\core\internal\abort.d \
 	src\core\internal\convert.d \

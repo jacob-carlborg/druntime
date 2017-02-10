@@ -23,6 +23,7 @@ COPY=\
 	$(IMPDIR)\core\ast\statement.d \
 	$(IMPDIR)\core\ast\symbol.d \
 	$(IMPDIR)\core\ast\type.d \
+  $(IMPDIR)\core\ast\util.d \
 	\
 	$(IMPDIR)\core\internal\abort.d \
 	$(IMPDIR)\core\internal\convert.d \

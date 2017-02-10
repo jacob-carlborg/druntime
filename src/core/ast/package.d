@@ -37,5 +37,7 @@ public import core.ast.ast_node;
 public import core.ast.declaration;
 public import core.ast.expression;
 public import core.ast.initializer;
+public import core.ast.statement;
 public import core.ast.symbol;
 public import core.ast.type;
+public import core.ast.util;

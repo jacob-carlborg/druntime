@@ -9,6 +9,10 @@
 module core.ast.type;
 
 import core.ast.ast_node;
+import core.ast.declaration;
+import core.ast.expression;
+import core.ast.util;
+import core.ast.symbol;
 
 /**
  * This enum represents a type kind/tag which all types contain.
@@ -177,15 +181,18 @@ abstract class Type : AstNode
     /// The type kind/tag of the type
     TypeKind typeKind;
 
+    string deco;
+
     /**
      * Initializes this instance with the given type kind.
      *
      * Params:
      *  typeKind = the type kind of the type
      */
-    this(TypeKind typeKind)
+    this(TypeKind typeKind, string deco)
     {
         this.typeKind = typeKind;
+        this.deco = deco;
     }
 
     /**
@@ -247,14 +254,135 @@ final class BasicType : Type
      * Params:
      *  typeKind = the type kind indicates the actual type
      */
-    this(TypeKind typeKind)
+    this(TypeKind typeKind, string deco)
     {
-        super(typeKind);
+        super(typeKind, deco);
     }
 
     /// ditto
-    static BasicType opCall(TypeKind kind)
+    static BasicType opCall(TypeKind kind, string deco)
     {
-        return new BasicType(kind);
+        return new BasicType(kind, deco);
+    }
+}
+
+abstract class NextType : Type
+{
+    private enum nodeType = NodeType.nextType;
+
+    Type next;
+
+    this(TypeKind typeKind, string deco, Type next)
+    {
+        super(typeKind, deco);
+        this.next = next;
+    }
+}
+
+class ArrayType : NextType
+{
+    private enum nodeType = NodeType.arrayType;
+
+    this(TypeKind typeKind, string deco, Type next)
+    {
+        super(typeKind, deco, next);
+    }
+}
+
+class PointerType : NextType
+{
+    private enum nodeType = NodeType.pointerType;
+
+    this(string deco, Type type)
+    {
+        super(TypeKind.pointer, deco, type);
+    }
+
+    static PointerType opCall(string deco, Type type)
+    {
+        return new PointerType(deco, type);
+    }
+}
+
+final class EnumType : Type
+{
+    private enum nodeType = NodeType.enumType;
+
+    EnumDeclaration declaration;
+
+    this(string deco, EnumDeclaration declaration)
+    {
+        super(TypeKind.enum_, deco);
+        this.declaration = declaration;
+    }
+
+    static EnumType opCall(string deco, EnumDeclaration declaration)
+    {
+        return new EnumType(deco, declaration);
+    }
+}
+
+final class FunctionType : NextType
+{
+    private enum nodeType = NodeType.functionType;
+
+    Parameter[] parameters;
+    VariadicType variadicType;
+    Linkage linkage;
+
+    this(string deco, Parameter[] parameters, Type returnType,
+        VariadicType variadicType = VariadicType.nonVariadic,
+        Linkage linkage = Linkage.d)
+    {
+        super(TypeKind.function_, deco, returnType);
+        this.parameters = parameters;
+        this.variadicType = variadicType ;
+        this.linkage = linkage;
+    }
+
+    /// ditto
+    static FunctionType opCall(string deco, Parameter[] parameters, Type returnType,
+        VariadicType variadicType = VariadicType.nonVariadic,
+        Linkage linkage = Linkage.d)
+    {
+        return new FunctionType(deco, parameters, returnType, variadicType, linkage);
+    }
+}
+
+final class TupleType : Type
+{
+    private enum nodeType = NodeType.tupleType;
+
+    Parameter[] arguments;
+
+    this(string deco, Parameter[] arguments)
+    {
+        super(TypeKind.tuple, deco);
+        this.arguments = arguments;
+    }
+}
+
+final class Parameter : AstNode
+{
+    private enum nodeType = NodeType.parameter;
+
+    StorageClass storageClass;
+    Type type;
+    Identifier identifier;
+    Expression defaultArgument;
+
+    this(StorageClass storageClass, Type type, Identifier identifier,
+        Expression defaultArgument = null)
+    {
+        this.storageClass = storageClass;
+        this.type = type;
+        this.identifier = identifier;
+        this.defaultArgument = defaultArgument;
+    }
+
+    static Parameter opCall(StorageClass storageClass, Type type,
+        Identifier identifier, Expression defaultArgument = null)
+    {
+        return new Parameter(storageClass, type, identifier, defaultArgument);
     }
 }
