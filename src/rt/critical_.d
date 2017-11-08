@@ -17,13 +17,13 @@ nothrow:
 
 import rt.monitor_, core.atomic;
 
-extern (C) void _d_critical_init()
+extern (C) void _d_critical_init() nothrow
 {
     initMutex(cast(Mutex*)&gcs.mtx);
     head = &gcs;
 }
 
-extern (C) void _d_critical_term()
+extern (C) void _d_critical_term() nothrow
 {
     for (auto p = head; p; p = p.next)
         destroyMutex(cast(Mutex*)&p.mtx);

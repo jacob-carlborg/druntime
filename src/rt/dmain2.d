@@ -40,14 +40,14 @@ version (NetBSD)
     import core.stdc.fenv;
 }
 
-extern (C) void _d_monitor_staticctor();
-extern (C) void _d_monitor_staticdtor();
-extern (C) void _d_critical_init();
-extern (C) void _d_critical_term();
+extern (C) void _d_monitor_staticctor() nothrow;
+extern (C) void _d_monitor_staticdtor() nothrow;
+extern (C) void _d_critical_init() nothrow;
+extern (C) void _d_critical_term() nothrow;
 extern (C) void gc_init();
 extern (C) void gc_term();
 extern (C) void lifetime_init();
-extern (C) void rt_moduleCtor();
+extern (C) void rt_moduleCtor() nothrow;
 extern (C) void rt_moduleTlsCtor();
 extern (C) void rt_moduleDtor();
 extern (C) void rt_moduleTlsDtor();
@@ -159,7 +159,7 @@ shared size_t _initCount;
  * If a C program wishes to call D code, and there's no D main(), then it
  * must call rt_init() and rt_term().
  */
-extern (C) int rt_init()
+extern (C) int rt_init() nothrow
 {
     /* @@BUG 11380 @@ Need to synchronize rt_init/rt_term calls for
        version (Shared) druntime, because multiple C threads might
@@ -190,7 +190,14 @@ extern (C) int rt_init()
     catch (Throwable t)
     {
         _initCount = 0;
-        _d_print_throwable(t);
+
+        try
+            _d_print_throwable(t);
+        catch (Throwable)
+        {
+            printf("An error was thrown trying to print an error\n");
+            return 1;
+        }
     }
     _d_critical_term();
     _d_monitor_staticdtor();
@@ -200,7 +207,7 @@ extern (C) int rt_init()
 /**********************************************
  * Terminate use of druntime.
  */
-extern (C) int rt_term()
+extern (C) int rt_term() nothrow
 {
     if (!_initCount) return 0; // was never initialized
     if (atomicOp!"-="(_initCount, 1)) return 1;
@@ -215,7 +222,13 @@ extern (C) int rt_term()
     }
     catch (Throwable t)
     {
-        _d_print_throwable(t);
+        try
+            _d_print_throwable(t);
+        catch (Throwable)
+        {
+            printf("An error was thrown trying to print an error\n");
+            return 1;
+        }
     }
     finally
     {

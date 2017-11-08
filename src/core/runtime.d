@@ -50,7 +50,7 @@ private
     extern (C) TraceHandler rt_getTraceHandler();
 
     alias void delegate( Throwable ) ExceptionHandler;
-    extern (C) void _d_print_throwable(Throwable t);
+    extern (C) void _d_print_throwable(Throwable t) nothrow;
 
     extern (C) void* thread_stackBottom();
 

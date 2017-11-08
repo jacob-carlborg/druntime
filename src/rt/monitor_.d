@@ -131,7 +131,7 @@ extern (C) void rt_detachDisposeEvent(Object h, DEvent e)
 
 nothrow:
 
-extern (C) void _d_monitor_staticctor()
+extern (C) void _d_monitor_staticctor() nothrow
 {
     version (Posix)
     {
@@ -141,7 +141,7 @@ extern (C) void _d_monitor_staticctor()
     initMutex(&gmtx);
 }
 
-extern (C) void _d_monitor_staticdtor()
+extern (C) void _d_monitor_staticdtor() nothrow
 {
     destroyMutex(&gmtx);
     version (Posix)
@@ -176,22 +176,22 @@ else version (Posix)
     alias Mutex = pthread_mutex_t;
     __gshared pthread_mutexattr_t gattr;
 
-    void initMutex(pthread_mutex_t* mtx)
+    void initMutex(pthread_mutex_t* mtx) nothrow
     {
         pthread_mutex_init(mtx, &gattr) && assert(0);
     }
 
-    void destroyMutex(pthread_mutex_t* mtx)
+    void destroyMutex(pthread_mutex_t* mtx) nothrow
     {
         pthread_mutex_destroy(mtx) && assert(0);
     }
 
-    void lockMutex(pthread_mutex_t* mtx)
+    void lockMutex(pthread_mutex_t* mtx) nothrow
     {
         pthread_mutex_lock(mtx) && assert(0);
     }
 
-    void unlockMutex(pthread_mutex_t* mtx)
+    void unlockMutex(pthread_mutex_t* mtx) nothrow
     {
         pthread_mutex_unlock(mtx) && assert(0);
     }

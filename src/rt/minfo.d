@@ -788,7 +788,7 @@ int moduleinfos_apply(scope int delegate(immutable(ModuleInfo*)) dg)
 
 extern (C)
 {
-void rt_moduleCtor()
+void rt_moduleCtor() nothrow
 {
     foreach (ref sg; SectionGroup)
     {
