@@ -56,6 +56,7 @@ version (LDC)
     {
         version (iOS) {}
         else version (TVOS) {}
+        else version (WatchOS) {}
         else
         {
             static import ldc.internal.vararg;

@@ -10,6 +10,15 @@
 
 module rt.sections_elf_shared;
 
+version (OSX)
+    version = Darwin;
+else version (iOS)
+    version = Darwin;
+else version (TVOS)
+    version = Darwin;
+else version (WatchOS)
+    version = Darwin;
+
 version (CRuntime_Glibc) enum SharedELF = true;
 else version (CRuntime_Musl) enum SharedELF = true;
 else version (FreeBSD) enum SharedELF = true;
@@ -18,7 +27,7 @@ else version (DragonFlyBSD) enum SharedELF = true;
 else version (CRuntime_UClibc) enum SharedELF = true;
 else enum SharedELF = false;
 
-version (OSX) enum SharedDarwin = true;
+version (Darwin) enum SharedDarwin = true;
 else enum SharedDarwin = false;
 
 static if (SharedELF || SharedDarwin):
@@ -41,14 +50,13 @@ else version (FreeBSD)
     import core.sys.freebsd.sys.elf;
     import core.sys.freebsd.sys.link_elf;
 }
-else version (OSX)
+else version (Darwin)
 {
     import core.sys.darwin.dlfcn;
     import core.sys.darwin.mach.dyld;
     import core.sys.darwin.mach.getsect;
 
     extern(C) intptr_t _dyld_get_image_slide(const mach_header*) nothrow @nogc;
-    extern(C) mach_header* _dyld_get_image_header_containing_address(const void *addr) nothrow @nogc;
 }
 else version (NetBSD)
 {
@@ -411,7 +419,7 @@ else
 // Compiler to runtime interface.
 ///////////////////////////////////////////////////////////////////////////////
 
-version (OSX)
+version (Darwin)
     private alias ImageHeader = mach_header*;
 else
     private alias ImageHeader = dl_phdr_info;
@@ -926,11 +934,18 @@ bool findImageHeaderForAddr(in void* addr, ImageHeader* result=null) nothrow @no
          */
         return dl_iterate_phdr(&callback, &dg) != 0;
     }
-    else version (OSX)
+    else version (Darwin)
     {
-        auto header = _dyld_get_image_header_containing_address(addr);
-        if (result) *result = header;
-        return !!header;
+        Dl_info info;
+        const res = dladdr(addr, &info);
+
+        if (res == 0)
+            return false;
+
+        if (result)
+            *result = cast(ImageHeader) info.dli_fbase;
+
+        return true;
     }
     else version (FreeBSD)
     {
@@ -968,7 +983,7 @@ static if (SharedELF) bool findSegmentForAddr(const scope ref dl_phdr_info info,
 version (linux) import core.sys.linux.errno : program_invocation_name;
 // should be in core.sys.freebsd.stdlib
 version (FreeBSD) extern(C) const(char)* getprogname() nothrow @nogc;
-version (OSX) extern(C) const(char)* getprogname() nothrow @nogc;
+version (Darwin) extern(C) const(char)* getprogname() nothrow @nogc;
 version (DragonFlyBSD) extern(C) const(char)* getprogname() nothrow @nogc;
 version (NetBSD) extern(C) const(char)* getprogname() nothrow @nogc;
 
@@ -976,7 +991,7 @@ version (NetBSD) extern(C) const(char)* getprogname() nothrow @nogc;
 {
     version (linux) return program_invocation_name;
     version (FreeBSD) return getprogname();
-    version (OSX) return getprogname();
+    version (Darwin) return getprogname();
     version (DragonFlyBSD) return getprogname();
     version (NetBSD) return getprogname();
 }
@@ -1048,8 +1063,8 @@ static if (SharedDarwin)
         // for https://github.com/ldc-developers/ldc/issues/1252
     }
 
-    version (X86_64)
-        import rt.sections_osx_x86_64 : getTLSRange;
+    version (D_LP64)
+        import rt.sections_darwin_64 : getTLSRange;
     else
         static assert(0, "Not implemented for this architecture");
 }

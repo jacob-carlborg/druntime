@@ -17,13 +17,22 @@ nothrow:
 @nogc:
 
 version (OSX)
-    version = OSXBSDLocale;
+    version = Darwin;
+else version (iOS)
+    version = Darwin;
+else version (TVOS)
+    version = Darwin;
+else version (WatchOS)
+    version = Darwin;
+
+version (Darwin)
+    version = BSDLocale;
 version (FreeBSD)
-    version = OSXBSDLocale;
+    version = BSDLocale;
 version (NetBSD)
-    version = OSXBSDLocale;
+    version = BSDLocale;
 version (DragonFlyBSD)
-    version = OSXBSDLocale;
+    version = BSDLocale;
 
 
 ///
@@ -68,7 +77,7 @@ char*    setlocale(int category, const char* locale);
 /// Set the per-thread locale
 locale_t uselocale (locale_t locale);
 
-version (OSXBSDLocale)
+version (BSDLocale)
 {
     ///
     enum

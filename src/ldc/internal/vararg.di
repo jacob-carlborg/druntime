@@ -11,7 +11,7 @@ version (AArch64)
 {
     // AAPCS64 defines this parameter control block in section 7.1.4.
     // Handling of variable argument lists is described in appendix B.
-    // http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055b/IHI0055B_aapcs64.pdf 
+    // http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055b/IHI0055B_aapcs64.pdf
     extern (C++, std) struct __va_list
     {
         void* __stack;
